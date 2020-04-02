@@ -192,11 +192,11 @@ export class Model {
         var vertices = objData[0];
         var normals = objData[1];
 
-        console.log("Nb vertices: " + vertices.length/3);
+      //  console.log("Nb vertices: " + vertices.length/3);
         
         this.computeBoundingBox(vertices);
-        console.log("BBox min: "+this.bbmin[0]+","+this.bbmin[1]+","+this.bbmin[2]);
-        console.log("BBox max: "+this.bbmax[0]+","+this.bbmax[1]+","+this.bbmax[2]);
+     //   console.log("BBox min: "+this.bbmin[0]+","+this.bbmin[1]+","+this.bbmin[2]);
+      //  console.log("BBox max: "+this.bbmax[0]+","+this.bbmax[1]+","+this.bbmax[2]);
 
         this.initParameters();
 
@@ -224,13 +224,13 @@ export class Model {
         
         this.gl.bindVertexArray(null);
 
-        console.log("model initialized");
+       // console.log("model initialized");
         this.loaded = true;
     }
 
     initParameters() {
 
-        console.log("model.ts::initParameters");
+        //console.log("model.ts::initParameters");
         
         this.modelMatrix = mat4.create();
         this.viewMatrix = mat4.create();
@@ -406,7 +406,7 @@ export class Model {
         //lumiere 
         (this.shader as any).lightUniform = this.gl.getUniformLocation(this.shader, "ul");
 
-        console.log("model shader initialized");
+        //console.log("model shader initialized");
     }
 
 }

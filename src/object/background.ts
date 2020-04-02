@@ -55,7 +55,7 @@ export class Background {
         (this.shader as any).frequencyUniform = this.gl.getUniformLocation((this.shader as any), "uFrequency");
         (this.shader as any).persistenceUniform = this.gl.getUniformLocation((this.shader as any), "uPersistence");
     
-        console.log("background shader initialized");
+        //console.log("background shader initialized");
     }
 
         
@@ -92,7 +92,7 @@ export class Background {
 
         this.gl.bindVertexArray(null);
 
-        console.log("background initialized");
+        //console.log("background initialized");
     }
 
     initParameters() {

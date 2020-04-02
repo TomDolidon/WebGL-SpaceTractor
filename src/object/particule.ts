@@ -1,7 +1,8 @@
-import { Ennemy } from "./ennemy";
+import { Splat } from "./splat";
 
-export class Ennemy2 extends Ennemy {
+export class Particule extends Splat {
 
+ 
     constructor(    
         gl: WebGL2RenderingContext,
         filename: string,
@@ -15,8 +16,7 @@ export class Ennemy2 extends Ennemy {
 
     setParameters(elapsed : number) {
         this.time += 0.01*elapsed;
-        this.position[0] -= 0.005; 
-        this.position[1] += 0.02*Math.sin(this.time * 0.2);      
+        this.position[0] -= 0.0001; 
     }
 
 }  

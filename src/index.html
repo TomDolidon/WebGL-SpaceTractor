@@ -247,7 +247,7 @@
 <script src="main.ts"></script>
 
     <body style="margin: 0;">
-        <!-- <canvas id="canvas" style=" 
+         <canvas id="canvas" style=" 
             background: #1c3149;
             background: -moz-radial-gradient(center, ellipse cover,  #1c3149 0%, #0d121c 80%);
             background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,#1c3149), color-stop(80%,#0d121c));
@@ -257,22 +257,20 @@
             background: radial-gradient(ellipse at center,  #1c3149 0%,#0d121c 80%);
             overflow: hidden;
             margin:0;" >
-        </canvas> -->
-
-         <canvas id="canvas"></canvas>
+        </canvas> 
 
 
-        <div id="game-over" style="display: none; text-align: center;">
-            <span style="color: red; font-weight: bold;">VOUS AVEZ PERDU !</span>
-            <button onclick="location.reload()">Rejouer</button>
+        <div id="game-over" style="display: none; text-align: center; width: 100%">
+            <p style=" margin-top: 15%; color: red; font-size: 100px; font-weight: bold; width: 100%; text-align: center;">VOUS AVEZ PERDU !</p>
+            <button onclick="location.reload()" style=" margin: 0 40%; width: 20%; text-align: center;">Rejouer</button>
         </div>
 
         <div id="infos">
-            <span id="score" style="position: absolute; font-size: 40px; bottom: 20; right: 30;">Score: 0</span>
-            <p id="life-left" style="position: absolute; font-size: 25px; bottom: 90; left: 30;">Vies: 3 </p>
-            <p id="killed-ennemies" style="position: absolute; font-size: 25px; bottom: 60; left: 30;">Ennemis tués: 0</p>
-            <p id="killed-boss" style="position: absolute; font-size: 25px; bottom: 30; left: 30;">Champion tués: 0</p>
-            <p id="shooted-shoot" style="position: absolute; font-size: 25px; bottom: 0; left: 30;">Missiles tirés: 0</p>
+            <span id="score" style="position: absolute; font-size: 40px; bottom: 20; right: 30; color: whitesmoke;">Score: 0</span>
+            <p id="life-left" style="position: absolute; font-size: 25px; bottom: 90; left: 30; color: whitesmoke;">Vies: 3 </p>
+            <p id="killed-ennemies" style="position: absolute; font-size: 25px; bottom: 60; left: 30; color: whitesmoke;">Ennemis tués: 0</p>
+            <p id="killed-boss" style="position: absolute; font-size: 25px; bottom: 30; left: 30; color: whitesmoke;">Champion tués: 0</p>
+            <p id="shooted-shoot" style="position: absolute; font-size: 25px; bottom: 0; left: 30; color: whitesmoke;">Missiles tirés: 0</p>
         </div>
     
     </body>

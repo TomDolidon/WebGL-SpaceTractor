@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // background = new Background();
       
     // la couleur de fond sera grise fonc�e
-    gl.clearColor(0.3, 0.3, 0.3, 1.0);
+    gl.clearColor(0.0, 0.0, 0.0, 0.0);
     // active le test de profondeur 
     gl.enable(gl.DEPTH_TEST);
   

@@ -1,15 +1,17 @@
 import { Splat } from "../splat";
 import { Ennemy } from "./ennemy";
 
-export abstract class Ennemy1 extends Ennemy {
+export class Ennemy1 extends Ennemy {
 
     constructor(    
         gl: WebGL2RenderingContext,
         filename: string,
-        shader: WebGLProgram
+        shader: WebGLProgram,
+        width: number,
+        height: number
         )
     {
-        super(gl, filename, shader)
+        super(gl, filename, shader, width, height)
     }
 
     setParameters(elapsed : number) {

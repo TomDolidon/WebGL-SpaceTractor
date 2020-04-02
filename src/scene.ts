@@ -7,6 +7,7 @@ import { Ennemy2 } from "./object/mobs/ennemy2";
 import { Ennemy3 } from "./object/mobs/ennemy3";
 import { Background } from "./object/background";
 import { Boss } from "./object/mobs/boss";
+import { Particule } from "./object/particule";
 
 // @ts-ignore
 const objectUri = require("./assets/tractor.obj");
@@ -19,6 +20,9 @@ const ennemyUri = require("./assets/chevre.png");
 
 // @ts-ignore
 const bossUri = require("./assets/taureau.png");
+
+// @ts-ignore
+const particuleUri = require("./assets/particule.png");
 
 
 export class Scene {
@@ -41,6 +45,9 @@ export class Scene {
 
     background: Background;
 
+    particuleLimit = 1000;
+    particules: Particule[] = [];
+
     lastTime = 0;
 
     lastTimeMissile = 0;
@@ -49,7 +56,7 @@ export class Scene {
     lifeLeft = 3;
     killedEnnemies = 0;
     killedBoss = 0;
-    shootedShoot = 0;
+    missillesFired = 0;
     killedEnnemiesSinceBoss = 0;
     score = 0;
     gameOver = false;
@@ -85,11 +92,9 @@ export class Scene {
 
     initScene(){
 
-        const backgroundShader = initShaders(this.gl, "background-vs","background-fs");
-
-        this.background = new Background(this.gl, backgroundShader);
-
-        this.background.initBackgroundShader();
+       // const backgroundShader = initShaders(this.gl, "background-vs","background-fs");
+        //this.background = new Background(this.gl, backgroundShader);
+        //this.background.initBackgroundShader();
 
         const modelShader = initShaders(this.gl, "model-vs","model-fs");
   
@@ -106,8 +111,28 @@ export class Scene {
 
         this.splatShader = initShaders(this.gl, "splat-vs","splat-fs");
         Splat.initSplatShader(this.gl, this.splatShader);
+
+        this.initParticule();
         
     }
+
+    initParticule() {
+        while (this.particules.length < this.particuleLimit) {
+            const x = Math.random() * 2 - 1;
+            var y = Math.random() * 2 - 1;
+            var z = Math.random() * 2 - 1;
+
+            let particule = new Particule(this.gl, particuleUri, this.splatShader, 0.005 * this.windowsSizeRatio, 0.005 );
+
+            particule.width = 0.001;
+            particule.height = 0.001;
+            
+            particule.setPosition(x, y, z);
+            this.particules.push(particule);
+        }
+    }
+
+
     
 // animation 
     animate() {
@@ -119,7 +144,7 @@ export class Scene {
             let elapsed = timeNow - this.lastTime;
             this.playerModel?.setParameters(elapsed);
 
-            this.background.setParameters(elapsed);
+            //this.background.setParameters(elapsed);
 
 
             this.missiles.forEach(element => {
@@ -135,6 +160,10 @@ export class Scene {
                 this.boss.setParameters(elapsed);
             }          
 
+            this.particules.forEach(element => {
+                element.setParameters(elapsed);
+            }) 
+
         }
         this.lastTime = timeNow;
     }
@@ -142,12 +171,11 @@ export class Scene {
     tick() {
         if (!this.gameOver) {
 
-
-
             window.requestAnimationFrame(this.tick.bind(this));
             this.cleanOutOfSceneObjects();
             this.handleKeys();
             this.ennemyManager();
+            this.particuleManager();
             this.collisionManager();
             this.infoManager();
             this.lifeManager();
@@ -169,9 +197,9 @@ export class Scene {
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     
         // dessin du fond (d�commenter pour travailler dessus)
-        gl.useProgram(this.background.getShader());
-        this.background.sendUniformVariables();
-        this.background.draw();
+      //  gl.useProgram(this.background.getShader());
+       // this.background.sendUniformVariables();
+       // this.background.draw();
     
         // dessin du vaisseau
         gl.useProgram(this.playerModel.getShader());
@@ -198,16 +226,14 @@ export class Scene {
             this.boss.sendUniformVariables();
             this.boss.draw();
           }
+
+          this.particules.forEach(element => {
+            gl.useProgram(element.getShader());
+            element.sendUniformVariables();
+            element.draw();
+        }); 
     
         gl.disable(gl.BLEND); // transparence d�sactiv�e 
-    }
-
-    addModel() {
-
-    }
-
-    addSplat() {
-
     }
 
     handleKeys() {
@@ -251,11 +277,13 @@ export class Scene {
                 const y = (p[0][1] + p[1][1]) / 2;
                 var z = p[1][2] + 0.005; // profondeur du splat (juste derri�re le vaisseau)
             
-                const missile = new Missile(this.gl, missileUri, this.splatShader);
+                const missile = new Missile(this.gl, missileUri, this.splatShader, 0.3  * this.windowsSizeRatio, 0.2);
                 missile.setPosition(x, y, z);                 
                 this.missiles.push(missile);
 
                 this.lastTimeMissile = timeNowMissile;
+
+                this.missillesFired++
 
             }
         } 
@@ -267,6 +295,8 @@ export class Scene {
         this.cleanOutOfSceneMissile();
         this.cleanOutOfSceneEnnemies();
         this.cleanOutOfSceneBoss();
+        this.cleanOutOfSceneParticule()
+
     }
 
     cleanOutOfSceneEnnemies() {
@@ -290,6 +320,16 @@ export class Scene {
         })
     }
 
+    cleanOutOfSceneParticule(){
+        // Pour chaque projectile
+        this.particules.forEach((element, index) => {
+            if (element.position[0] < -1.0) {
+            this.particules.splice(index, 1);
+            element.clear();
+            }
+        })
+    }
+
     cleanOutOfSceneBoss(){
         if (this.spawnBossAvailable && typeof this.boss != "undefined") {
             if (this.boss.position[0] < (-1.2)) {
@@ -303,15 +343,29 @@ export class Scene {
           } 
     }
 
+
     setScore(value: number) {
         this.score += value;
+    }
+
+    particuleManager() {
+        while (this.particules.length < this.particuleLimit) {
+            const x = 1.0;
+            var y = Math.random() * 2 - 1;
+            var z = Math.random() * 2 - 1;
+
+            let particule = new Particule(this.gl, particuleUri, this.splatShader, 0.005  * this.windowsSizeRatio, 0.005);            
+
+            particule.setPosition(x, y, z);
+            this.particules.push(particule);
+        }
     }
 
 
         
     ennemyManager() {
         const spawRate = 20;
-        const maxEnnemies = 3;
+        const maxEnnemies = 4;
 
         const nbEnnemyType = 3; 
 
@@ -330,12 +384,12 @@ export class Scene {
         
                 switch (ennemyType) {
                     case 1:
-                        ennemy = new Ennemy1(this.gl, ennemyUri, this.splatShader);
+                        ennemy = new Ennemy1(this.gl, ennemyUri, this.splatShader, 0.2 * this.windowsSizeRatio, 0.2);
                         ennemy.setPosition(x, y, z);
                         this.ennemies.push(ennemy);
                         break;
                     case 2:
-                        ennemy = new Ennemy2(this.gl, ennemyUri, this.splatShader);
+                        ennemy = new Ennemy2(this.gl, ennemyUri, this.splatShader, 0.2 * this.windowsSizeRatio, 0.2 );
 
                         y = Math.random() * 1.5 - 0.5;
                         z = Math.random() * 2 - 1;
@@ -344,7 +398,7 @@ export class Scene {
                         this.ennemies.push(ennemy);
                         break;
                     case 3:
-                        ennemy = new Ennemy3(this.gl, ennemyUri, this.splatShader);
+                        ennemy = new Ennemy3(this.gl, ennemyUri, this.splatShader, 0.2 * this.windowsSizeRatio, 0.2);
                         ennemy.setPosition(x, y, z);
                         this.ennemies.push(ennemy);
                         break;
@@ -355,14 +409,12 @@ export class Scene {
         }
 
         if (this.spawnBossAvailable && !this.boss) {
-
-            console.log("new bosss");
             
             var x = 1.3;
             var y = Math.random() * 2 - 1;
             var z = Math.random() * 2 - 1;
 
-            this.boss = new Boss(this.gl, bossUri, this.splatShader);
+            this.boss = new Boss(this.gl, bossUri, this.splatShader, 0.3  * this.windowsSizeRatio, 0.3);
             this.boss.setPosition(x, y, z);
             this.boss.life = 3;
         }
@@ -375,11 +427,13 @@ collisionManager() {
 
     //console.log(positions);
     
-    
     var x1 = positions[0][0];
     var x2 = positions[1][0];
     var y1 = positions[0][1];
     var y2 = positions[1][1];
+
+   // console.log(positions);
+    
 
     // Pour chaque ennemis
     this.ennemies.forEach((ennemy, index) => {
@@ -403,7 +457,7 @@ collisionManager() {
           this.setScore(50);
         }
 
-        if (this.killedEnnemiesSinceBoss >= 5) {
+        if (this.killedEnnemiesSinceBoss >= 10) {
             this.spawnEnnemyAvailable = false;
             this.spawnBossAvailable = true;
         }
@@ -411,7 +465,19 @@ collisionManager() {
       
       // Pour le tracteur de l'espace 
       // collision ennemi / tracteur
-      if (ennemy.position[0] < x1 && ennemy.position[0] > x2 && ennemy.position[1] > y1 && ennemy.position[1] < y2) {
+
+      if(ennemy.position[0] < x1 ) console.log("ok x1");
+
+      if(ennemy.position[0] > x2 ) console.log("ok x2");
+
+      
+      //console.log(ennemy.position[0]);
+      //console.log(x1);
+      if (ennemy.position[0] > x1 && ennemy.position[0] < x2 && ennemy.position[1] > y1 && ennemy.position[1] < y2) {
+
+    
+        
+        
         this.lifeLeft--;
 
         console.log("collisiooon");
@@ -454,7 +520,7 @@ collisionManager() {
       if (this.spawnBossAvailable && this.boss != undefined) {
 
         // Collision boss / tracteur
-        if (this.boss.position[0] < x1 && this.boss.position[0] > x2 && this.boss.position[1] > y1 && this.boss.position[1] < y2) {
+        if (this.boss.position[0] > x1 && this.boss.position[0] < x2 && this.boss.position[1] > y1 && this.boss.position[1] < y2) {
             this.lifeLeft = this.lifeLeft - 2;
             this.boss.clear();
             this.boss = undefined;
@@ -476,7 +542,7 @@ collisionManager() {
     document.getElementById("life-left").innerHTML = "Vies restantes: " + this.lifeLeft;
     document.getElementById("killed-ennemies").innerHTML = "Ennemis tu&eacute;s: " + this.killedEnnemies;
     document.getElementById("killed-boss").innerHTML = "Champions tu&eacute;s: " + this.killedBoss;
-    document.getElementById("shooted-shoot").innerHTML = "Missiles tir&eacute;s: " + this.shootedShoot;
+    document.getElementById("shooted-shoot").innerHTML = "Missiles tir&eacute;s: " + this.missillesFired;
   }
 
   lifeManager() {

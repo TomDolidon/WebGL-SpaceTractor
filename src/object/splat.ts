@@ -39,16 +39,34 @@ export class Splat {
     loaded = false;
 
 
-
     constructor(    
         gl: WebGL2RenderingContext,
         filename: string,
-        shader: WebGLProgram
+        shader: WebGLProgram,
+        width: number,
+        height: number
         )
     {
         this.gl = gl;
         this.shader = shader;
+
+        this.width = width;
+        this.height = height;
+    
+        this.wo2 = 0.5*this.width;
+        this.ho2 = 0.5*this.height;
+    
+        // un tableau contenant les positions des sommets (sur CPU donc)
+        this.vertices = [
+        -this.wo2,-this.ho2, -0.8,
+        this.wo2,-this.ho2, -0.8,
+        this.wo2, this.ho2, -0.8,
+        -this.wo2, this.ho2, -0.8
+        ];
+
+
         this.texture = this.initTexture(filename);
+
 
         this.initSplat();
 
@@ -174,7 +192,7 @@ export class Splat {
             vm.texParameteri(vm.TEXTURE_2D, vm.TEXTURE_WRAP_T, vm.CLAMP_TO_EDGE);
             vm.bindTexture(vm.TEXTURE_2D, null);        
             texture.width = this.width;
-            texture.height = this.height;
+            texture.height = this.height;            
         }
         
         texture.image.src = filename;

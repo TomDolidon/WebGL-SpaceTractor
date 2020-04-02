@@ -5,10 +5,12 @@ export abstract class Ennemy extends Splat {
     constructor(    
         gl: WebGL2RenderingContext,
         filename: string,
-        shader: WebGLProgram
+        shader: WebGLProgram,
+        width: number,
+        height: number
         )
     {
-        super(gl, filename, shader)
+        super(gl, filename, shader, width, height)
     }
 
 }  
