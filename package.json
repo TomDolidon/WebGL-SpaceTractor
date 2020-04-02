@@ -1,0 +1,17 @@
+{
+  "name": "spacetractor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Dolidon Tom - Sommveille Quentin",
+  "license": "ISC",
+  "dependencies": {
+    "gl-matrix": "^3.2.1"
+  },
+  "devDependencies": {
+    "parcel-bundler": "^1.12.4"
+  }
+}
